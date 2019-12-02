@@ -1,0 +1,573 @@
+Practical: 01
+ 	 
+Aim: Create tables using different applications. 
+ 
+a.	Table: Product 
+ 
+   
+b.	Table: Category 
+ 
+   
+c.	Table: Store 
+ 
+  
+ 
+d.	Table: Employee 
+ 
+   
+e.	Table: SalesFact 
+ 
+  
+ 
+ 	 
+ 
+Practical: 02
+ 	 
+Aim: Develop an application to design a warehouse by importing various tables from external Sources. 
+ 
+Step 1: To create a DTS Package. 
+ 
+a.	Click on start > SQL server > Enterprise Manager. 
+b.	Expand MS SQL Server. 
+c.	Right click on DTS and select New Package, it will open editor to create new DTS Package. 
+ 
+ 
+ 
+Step 2: Design DTS Package. 
+ 
+a.	Drag & drop MS Access connection to canvas from toolbar. 
+ 
+ 
+b.	Browse the source file i.e. SalesDB.mdb > Click OK. 
+ 
+ 
+ 
+c.	Drag and drop MS OLE DB from toolbar to canvas. 
+ 
+ 
+ 
+d.	Select destination DB (if required create new DB) 
+ 
+ 
+ 
+ 
+e.	To transform data from source to target. >Select Transform data task from toolbar and specify Source connection & Destination connection. 
+ 
+ 
+ 
+ 
+Step 3: Right click on transform data task and select Properties > Rename data                Transformations task and specify description (if required). 
+ 
+ 
+a.	In tables and views, select source table. 
+ 
+ 
+ 
+b.	Click on destination tab > specify destination table from drop-down (if it does not exist then create table). It will generate script for destination table. 
+ 
+ 	 
+c.	Click on transformation tab and delete all the existing default transformations. 
+ 
+ 
+ 
+d.	Click on new button to create new transformation >Specify transformation task as copy columns. It will open a window to map source & destination columns. 
+ 
+ 
+ 
+e.	Specify source columns >Select all columns of source by clicking on ‘>>’ 
+ 
+ 
+f.	Click on destination tab select all columns by clicking on’>>’ >It will show mapping of Source and destination. 
+ 
+   
+g.	Click OK. 
+ 
+  
+h.	Drag & drop Execute SQL task from toolbar to canvas > then provide Description/Name. >After that write a SQL query and Parse the query. 
+ 
+ 
+ 
+ 
+i.	Right click on Execute SQL Task and select Workflow > Workflow Properties. 
+ 
+ 
+ 
+j.	It will Open a window, in Precedence tab click on Source Step column select appropriate name from Drop down list & Click OK. 
+ 
+ 
+ 
+ 
+ 
+k.	Right click on Transform Data Task that connects MS Access Database to MS OLE DB > select Workflow Properties. 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+l.	It will open a window, in Precedence tab click on Source Step column select appropriate name from Drop down list & Click OK. 
+ 
+ 
+ 
+m.	Repeat same procedure from (Step 3- a. to l.). 
+  
+ 
+ 
+ 
+ 
+Step 5: In SalesDB > open tables. 
+ 
+ 
+ 
+Step 6: Right click on Table > Select Open Table > Return all rows. 
+ 
+a.	Output of Category Table. 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+b.	Output of Employee Table. 
+ 
+ 
+ 
+ 	 
+ 
+d. Output of SaleFact Table. 
+ 
+ 	 
+ 
+Practical: 03
+ 	 
+Aim: Develop an application to creating a fact table and measures in a cube. 
+ 
+Create a new OLAP database: 
+ 
+a.	Open Programs > Microsoft SQL Server > Analysis Services > Analysis Manager. 
+b.	Right click the server in the console tree, and click New Database to display the Database dialog Box. 
+c.	Type ‘SalesDB’ as the database name. 
+d.	Click OK to close the dialog box and to create the database. 
+ 
+Specify a data source: 
+ 
+a.	Expand the ‘MscDB’ folder. Right-click on Cubes Folder > Select New Cube > Select Wizard.  
+ 
+ + 
+   
+ 
+  
+ 
+ 
+  
+ 
+ 
+ 
+ 
+b.	Click New Data Source > Select Microsoft OLE DB Provider for SQL Server, and click Next.  
+ 
+   
+c.	In the connection Tab Select or enter Server Name. > Select DB on the server from drop down list. Click Test Connection to make sure the data source definition is correct. Then click OK to close the dialog box. 
+ 
+ 
+  
+ 
+ 
+d.	Select SalesFact table from the list of tables. 
+ 
+   
+e.	Right click on ‘Sales_cube’ and select Edit. It will open Cube editor >Right Click on ‘Sales_Cube’ and Select New Measures >Now create two new measures: ‘Sales’, ‘Quantity’. 
+ 
+ 
+ 
+ 
+ 
+ 
+NOTE:                    Import Export Steps 
+ 
+A) 
+  
+ 
+ 
+ 
+ 
+ 
+B) 
+ 
+C) 
+ 
+D) 
+  
+ 
+ 
+E) 
+  
+ 
+ 
+ 
+ 
+ 
+F) 
+  
+G) 
+ 	 
+  
+ 
+ 
+ 
+ 
+ 
+H) 
+I) 
+  	 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Practical: 04
+ 	 
+Aim: Develop an application to create dimension tables in a cube and form star schema. 
+ 
+Create a dimension from a Star Schema table: 
+ 
+a.	Click a New Dimension in the Wizard to start the Dimension Wizard. Select the option to skip the welcome screen, and then click on Next. 
+ 
+ 
+ 
+b.	Click the Option ‘Star Schema: A Single Dimension Table’, and the click Next. 
+ 
+ 
+c.	Select ‘SalesFact’ from Available Tables and click next. 
+ 
+ 
+ 
+d.	Select Time Dimension >Select Date column From Drop Down: ‘Dates’. & Click Next. 
+ 
+ 
+e.	Select Time Level: ‘Year, Quarter, Month’ > Click Next. 
+ 
+ 
+ 
+f.	Select all and click Next. 
+ 
+ 
+ 
+ 
+g.	Select Yes > Click Next.                
+ 
+ 
+ 
+h.	Give Dimension Name: TimeDimension> Click Finish. 
+ 
+ 
+i.	Create one more dimension: StoreDimension 
+ 
+j.	Click a New Dimension in the Wizard to start the Dimension Wizard. Select the option to skip the welcome screen, and then click on Next. 
+ 
+   
+k.	Click the Option ‘Star Schema: A Single Dimension Table’, and the click Next. 
+ 
+ 
+l.	Select ‘Store’ from Available Tables and click next. 
+ 
+ 
+ 
+m.	Specify Dimension Level: ‘Store Id’, ‘Store Name’ > Click Next. 
+ 
+ 
+ 
+n.	Select all and Click Next. 
+ 
+  
+ 
+ 
+ 	 
+ 
+ 
+ 
+p.	Give Dimension Name: ‘StoreDimension’ > Click Finish. 
+ 
+ 
+ 
+q.	Finally, cube is created > Cube Name: ‘Sales_Cube’. 
+ 
+  
+Star Schema: 
+   
+Practical: 05
+ 	 
+Aim: Develop an application to create dimension tables in a cube and form Snowflake Schema. 
+ 
+Create a dimension from Snowflake schema tables: 
+ 
+a.	Click a New Dimension in the Wizard to start the Dimension Wizard. Select the option to skip the welcome screen, and then click on Next. 
+ 
+ 
+ 
+b.	Click the Option ‘Snowflake Schema: Multiple, related dimension tables’ and the click Next. 
+ 
+ 
+c.	Select Product, Category table from Available Tables and click next. 
+ 
+ 
+d.	Click Next. 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+e.	Select Dimension levels : ‘Category’, ‘Brand Name’, ‘Product Name’ 
+ 
+ 
+ 
+f.	Click Next. 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+g.	Select all and Click Next. 
+ 
+ 
+ 
+h.	Select yes and click Next. 
+ 
+ 
+ 
+i.	Name  the dimension as : ‘Ashish1_Dimension’ 
+  
+ 
+ 
+View of SnowFlake Schema: 
+ 
+  
+ 
+ 
+ 
+ 
+ 
+Practical: 06
+ 	 
+Aim: Develop an application to create a dimension table from Parent-Child schema. 
+ 
+a.	Click a New Dimension in the Wizard to start the Dimension Wizard. Select the option to skip the welcome screen, and then click on Next. 
+ 
+ 
+b.	Click the Option ‘Parent-Child Schema: A Single Dimension Table’, and the click Next. 
+ 
+ 
+ 
+c.	Select tables Product, Category from Available Tables and click next. 
+ 
+ 
+d.	Select  a. ‘MemberKey’: EmpID  from drop down, b. ‘Parent Key’ :ManagerID  from drop down, c. ‘Member Name’ : Ename  from drop down. > Click Next. 
+ 
+ 
+ 
+ 
+ 
+g.	Enable Custom Rollups and click next. 
+ 
+  
+ 
+ 
+h.	Check the option and click next. 
+ 
+ 
+ 
+  
+ 
+ 
+i.	Name the Dimension: ‘EmployeeDimension’ 
+ 
+ 
+ 
+View of Parent-Child Schema: 
+ 
+ 
+  
+ 	  
+Practical: 07
+ 	 
+Aim: Develop an application to demonstrate operations like roll-up, drill-down, slice, and Dice. 
+ 
+a.	Click on Tools in menu bar and select ‘Drillthrough options...’ to perform drillthrough operation on cube. 
+ 
+  
+ 
+  
+b.	Check Enable drillthrough option > Click on Select all button and click OK. 
+ 
+ 
+View of drill-through Data: 
+  
+  
+c.	To perform roll up/down > Right click on your cube > Select Browse Data option 
+ 
+  
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+d.	To roll up/down through cube > Double click on + to roll-down and - to roll-up. 
+ 
+   
+e.	To perform slice operation > Select a particular value for one dimension. Similarly to perform dice operation = > Select a value for each dimension, result will be a sub-cube containing a value with respect to other dimensions. 
+ 
+  
+ 
+ 
+ 	 
+ 
+
+Practical: 08
+ 	 
+Aim: Develop an application to demonstrate processing and browsing data from a cube. 
+ 
+Processing a cube: 
+ 
+a. Right click on existing cube and select Process. 
+ 
+  
+ 
+ 
+  
+ 
+Browsing data in a cube : 
+ 
+a. Right click on existing cube and select Browse Data. 
+ 
+  
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+A cube browser will open. 
+ 
+  
+ 
+Double click a member to drill up(-) or down(+). 
+ 
+  
+To view data with respect to particular dimension, select particular value from drop-down to analyze. 
+ 
+ 
+ 
+.Practical: 09
+ 	 
+Aim: Develop an application to pre-process data imported from external sources. 
+ 
+a.	Right click on your cube > Select Edit > It will open a cube editor. 
+ 
+ 
+ 
+ 
+b.	Right click on your cube and select New Dimension >Click the Option Star Schema: A Single Dimension Table, and the click Next. 
+ 
+ 
+ 
+c.	Select table Product from Available Tables and click Next. 
+ 
+ 
+ 
+ 
+d.	Add the required columns in dimension levels. 
+ 
+ 	 
+ 
+ 
+e.	Select all and Click Next. 
+ 
+ 	 
+ 
+ 
+ 
+ 
+ 
+g.	Give Dimension Name: StoreDimension. > Click Finish. 
+ 
+ 
+ 
+h.	To create new measure > Right click on your cube > Select New Measure -> Select the table for which a new measure will be created in fact table. 
+ 
+ 
+ 
+ 
+i.	Adding a new calculated member in our cube ‘Commission > Right Click on Calculated Members > Select New Calculated Members. > Provide a valid expression on an existing measure whose value will be calculated and stored in this new measure. > Click OK. 
+ 
+ 
+ 
+Resultant view of cube: 
+ 
+ 
+To Create Pivot table and charts: 
+ 
+a.	Open Microsoft Excel > In the Data tab click on from other sources > click on From Analysis Services. It will a Data Connection Wizard > Enter the name of your analysis server, choose the authentication method > Click Next. 
+ 
+ 
+ 
+b.	Select the database that contains the cube -> Select the cube to be used. 
+ 
+ 
+ 
+ 
+c.	Click Finish. 
+ 
+ 
+ 
+d.	Select Pivot_Chart and PivotTableReport option and click OK. 
+ 
+ 
+ 
+ 
+ 
+ 
+e.	A chart with the default layout will be shown and in the right pane is the FieldList  from values and fields can be selected for chart/pivot table. 
+ 
+ 
+ 
+f.	After selecting measures with respect to ProductDimension. 
+ 
+ 
+ 
+ 
+Pivot table for the same values of measures and dimensions : 
+ 
+ 
+ 
+h. Adding more dimensions to our chart: ‘TimeDimension’ 
+ 
+ 
+ 
+Pivot the same values of measures and dimensions : 
+ 
+ 
+ 

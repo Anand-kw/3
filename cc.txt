@@ -1,0 +1,2286 @@
+PRACTICAL 01: 
+
+Aim: Develop a Time-Server Service that returns current Time in Java and call it from Clients developed in Java, PHP, Android and .NET.
+ 
+Service Endpoint Interface: ITimeServer.java 
+ 
+/* Service Endpoint Interface: An Interface that declares the Web Service Operations as its Methods. */ 
+ 
+package NtPd; 
+ 
+import javax.jws.WebService; import javax.jws.WebMethod; import javax.jws.soap.SOAPBinding; 
+import javax.jws.soap.SOAPBinding.Style; 
+ 
+@WebService 
+@SOAPBinding(style=Style.RPC) 
+ 
+public interface ITimeServer { 
+ 	@WebMethod String getTimeAsString(); 
+ 	@WebMethod long getTimeAsElapsed(); 
+} 
+ 
+ 
+Service Implementation Bean: MyTimeServerImpl.java 
+ 
+/* Service Implementation Bean: The Implementation Class of the Service Endpoint Interface. The SIB can be either a POJO or a stateless session EJB. 	*/ 
+ 
+package NtPd; 
+ 
+import java.util.Date; 
+import javax.jws.WebService; 
+ 
+@WebService (endpointInterface = "NtPd.ITimeServer") 
+ 
+public class MyTimeServerImpl implements ITimeServer { 
+ 	 
+ 	public String getTimeAsString() {  	 	return new Date().toString(); 
+ 	} 
+ 	 
+ 	public long getTimeAsElapsed() {  	 	return new Date().getTime(); 
+ 	} 
+} 
+ 
+ 
+ 
+ 
+ 
+ 
+Endpoint Publisher: MyTimeServerPublisher.java 
+/* The java.xml.Endpoint class can be used to publish a web service from a simple java application. 
+Out of the box, the Endpoint publisher handles one request at a time, but can be made multithreaded using an Executor. 
+The single threaded endpoint publisher is suited for development and the multithreaded one can be used in light production mode. 
+However, a web container such as tomcat is better suited to publish multiple web services in actual production. */ 
+package NtPd; 
+ 
+import javax.xml.ws.Endpoint; 
+ 
+public class MyTimeServerPublisher {  	public static void main (String[] args) { 
+ 	 	Endpoint.publish("http://127.0.0.1:9876/NtPd", new MyTimeServerImpl()); 
+System.out.print("Server Published."); 
+ 	} 
+} 
+ 
+ 
+Client: MyTimeServerClient.java 
+ 
+package NtPd; 
+ 
+import javax.xml.namespace.QName; import javax.xml.ws.Service; import java.net.URL; 
+import java.net.MalformedURLException; 
+ 
+class MyTimeClient { 
+ 	 
+ 	public static void main (String[] args) {  	 	try { 
+ 	 	 	URL url = new URL ("http://127.0.0.1:9876/NtPd?wsdl"); 
+ 	 	 
+ 	 	 	QName qn = new  QName("http://NtPd/","MyTimeServerImplService"); 
+ 	 	 	Service srvc = Service.create (url,qn); 
+ 	 	 	ITimeServer ITmSrvr = srvc.getPort(ITimeServer.class);  
+ 	 	 	System.out.println(ITmSrvr.getTimeAsElapsed());  	 	 	System.out.println(ITmSrvr.getTimeAsString()); 
+ 	 	} 
+ 	 	catch (MalformedURLException e) { e.printStackTrace(); } 
+ 	} 
+} 
+  
+ 
+Fig 1.1: Compiling the Publisher, the Client and then publishing the Publisher. 
+ 
+Fig 1.3: Web Service Description Language. 
+PHP Code 
+ 
+For PHP: 
+ 
+1.	Create a MyTime.php file in the root folder of php. (Here:C:\wamp64\www\) 
+ 
+  
+ 
+2.	Add the following code to it after making sure the Publisher is running by using the Command Prompt as above: 
+ 
+<?php 
+$client=new SoapClient("http://127.0.0.1:9876/NtPd?wsdl"); echo $client->getTimeAsString(); echo $client->getTimeAsElapsed(); 
+?> 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+3.	Run the File in Browser for the following Output. 
+ 
+  
+ 
+ 
+ASP.NET Code 
+ 
+1.	Create a Console Application under Visual C#. 
+ 
+  
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+2.	Delete the default Service Reference (.svc) and Code (.cs) File already present in it and add a new one as below.: Right Click > Add > Service Reference. 
+ 
+  
+ 
+ 
+3.	Add the published Address and click Go. Published Service Name will appear. Select it, provide it a Namespace and click OK 
+ 
+  
+4.	Add the following Code to the cs File: 
+ 
+SrvcRefTime.TimeServerClient c = new SrvcRefTime.TimeServerClient();  
+Console.WriteLine("Current Day & Time = " + c.getTimeAsString());  Console.WriteLine("Elapsed Time = " + c.getTimeAsElapsed());  Console.ReadKey(); 
+ 
+ 
+  
+ 
+5.	Run the cs File for the following Output. 
+ 
+  
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+6.	WSDL Output for the published Address: 
+Here: http://127.0.0.1:9876/NtPd 
+ 
+  
+ 
+  
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 	 
+ 
+ 
+ 
+ 
+ 
+PRACTICAL 02:
+
+Aim: Develop a Web-Service in Java that returns Complex Datatypes. (eg. List of Actors)
+ 
+Create several Java Classes as below: 
+ 
+Actor.java 
+ 
+package WS; 
+ 
+public class Actor { 
+ 	 
+ 	private String sName; 
+ 	private String sNickName; 
+ 	 
+ 	public Actor() {} 
+ 	 
+ 	public Actor(String n, String nn) { 
+ 	 	setName (n); 
+ 	 	setNickName (nn); 
+ 	} 
+ 	 
+ 	public void setName (String n) {   	this.sName = n; 
+ 	} 
+ 	public String getName () {   	return sName; 
+ 	} 
+ 	 
+ 	public void setNickName (String nn) {  
+ 	 	this.sNickName = nn; 
+ 	} 
+ 	public String getNickName () {  
+ 	 	return sNickName; 
+ 	} 
+} 
+ 
+Movie.java 
+ 
+package WS; 
+ 
+import java.util.List; 
+ 
+public class Movie { 
+ 	 
+ 	/* List is a collection of elements in a sequence where each element is an object and elements are accessed by there position (index). */  	private List<Actor> lstActors; 
+ 	private String sTitle; 
+ 	 
+ 	public Movie () {} 
+ 	 
+ 	public Movie (String n, List<Actor> As) { 
+ 
+	 	setTitle (n); 
+	 	setActors (As); 
+} 
+ 	 
+ 	public void setTitle (String n) { 
+ 	 	this.sTitle = n; 
+ 	} 
+ 	 
+ 	public String getTitle () {  
+ 	 	return sTitle; 
+ 	} 
+ 	 
+ 	public void setActors (List<Actor> As) {   	 	this.lstActors = As; 
+ 	} 
+ 	 
+ 	public List<Actor> getActors () {  
+ 	 	return lstActors; 
+ 	} 
+ 	 
+ 	public void setRosterCount (int n) {} 
+ 	 
+ 	public int getRosterCount () { 
+ 	 	return (lstActors == null) ? 0: lstActors.size(); 
+ 	} 
+} 
+ 
+MoviesUtility.java 
+ 
+package WS; 
+ 
+import java.util.Set; import java.util.List; import java.util.ArrayList; import java.util.Map; 
+import java.util.HashMap; 
+ 
+public class MoviesUtility { 
+ 	 
+ 	/* The Map Interface maps unique Keys to Values. A Key is an Object that you use to retrieve a Value at a later Date. Given a Key and a Value, you can store the Value in a Map Object. After the Value is stored, you can retrieve it by using its Key. Map is generic and is declared as shown here: 
+ 	 
+ 	Interface Map<K, V> 
+ 
+ 	Here, K specifies the type of Keys, and V specifies the type of Values. 
+ 	 
+ 	Several of the Methods declared by Map, throw a ClassCastException when an Object is incompatible with the elements in a map.  
+ A NullPointerException is thrown if an attempt is made to use a null Object and null is not allowed in the map.  
+ An UnsupportedOperationException is thrown when an attempt is made to change an unmodifiable map.  
+An IllegalArgumentException is thrown if an invalid argument is used. 
+ 
+Maps revolve around two basic operations: get( ) and put( ). To put a Value into a map, use put( ), specifying the Key and the Value. To obtain a Value, call get( ), passing the Key as an argument. The Value is returned. */ 
+ 	 
+ 	private Map<String, Movie> MovieMap; 
+ 	 
+ 	/* The HashMap class extends AbstractMap and implements the Map Interface. It uses a HashTable (explained later) to store the map. This allows the execution time of get() and put() to remain constant even for large sets. HashMap is a generic class that has this declaration: 
+ 	 
+ 	class HashMap<K, V>  
+ 	 
+ 	Here, K specifies the type of Keys, and V specifies the type of Values. 
+ 	 
+ 	The following constructors are defined: 
+ 	 
+ 	HashMap(): a default hash map 
+ HashMap(Map<? extends K, ? extends V> m):  initializes the hash map by using the elements of 'm' 
+ 	 
+ 	HashMap(int capacity):   	 	 	 	 	 	 	  	initializes the Capacity of the Hash-Map to Capacity. 
+ 	 
+ 	HashMap(int capacity, float fillRatio): initializes both the Capacity and Fill-Ratio of the Hash-Map by using its Arguments. The meaning of capacity and fill ratio is the same as for HashSet. 
+The default capacity is 16. The default fill ratio is 0.75. 
+ 	 	 	 	 	 	 	 	 	 	 	 
+ 	HashMap implements Map and extends AbstractMap. It does not add any Methods of its own. 
+ You should note that a HashMap does not guarantee the order of its Elements. Therefore, the Order in which Elements are added to a HashMap is not necessarily the Order in which they are read by an Iterator. 
+ 	 
+ Hashtable is integrated into the Collections Framework. It is similar to HashMap, but is synchronized. 
+ 	Like HashMap, Hashtable stores Key/Value pairs in a Hash Table. However, neither Keys nor 
+Values can be null. When using a Hashtable, you specify an Object that is used as a Key, and the Value that you want linked to that Key. The Key is then hashed, and the resulting hash code is used as the index at which the Value is stored within the table. 
+ 	Hashtable was made generic by JDK 5. It is declared like this: 
+ 
+ 	class Hashtable<K, V> 
+ 	 
+ 	Here, K specifies the type of Keys, and V specifies the type of Values. 
+ A Hashtable can only store Objects that override the hashCode( ) and equals( ) Methods that are defined by Object.  
+ 	The hashCode() Method must compute and return the hash code for the Object. Of course, equals() compares two Objects. Fortunately, many of Java’s built-in classes already implement the hashCode() Method. For example, the most common type of Hashtable uses a String Object as the Key. String implements both hashCode( ) and equals(). 
+ 	The Hashtable Constructors are shown here: 
+ 	Hashtable() 
+Hashtable(int size) 
+Hashtable(int size, float fillRatio) 
+Hashtable(Map<? extends K, ? extends V> m)   
+ 	 
+ 	---- 
+ 	 
+ 	DIFFERENCE between HashMap and Hashtable: 
+ 
+    Hashtable is synchronized, whereas HashMap is not. This makes HashMap better for non-threaded applications, as unsynchronized Objects typically perform better than synchronized ones. 
+    Hashtable does not allow null keys or values. HashMap allows one null key and any number of null values. 
+    One of HashMap's subclasses is LinkedHashMap, so in the event that you'd want predictable iteration order (which is insertion order by default), you could easily swap out the HashMap for a LinkedHashMap. This wouldn't be as easy if you were using Hashtable. 
+ 	IF Synchronization is not an issue, HashMap is recommended . If synchronization becomes an issue, you may also look at ConcurrentHashMap 	*/ 
+ 	 
+ 	public MoviesUtility () { 
+ 	 	 	MovieMap = new HashMap<String, Movie>(); 
+ 	} 
+ 	 
+ 	public void create_Festival () { 
+ 	 	 
+ 	 	Actor DW = new Actor ("Denzel Washington" , "Denzy"); 
+ 	 	Actor AS = new Actor("Arnold Schwarzenegger" , "Arnie"); 
+ 	 	Actor CB = new Actor("Cate Blanchett" , "Cat"); 
+ 	 	Actor NP = new Actor("Natalie Portman" , "Natie"); 
+ 	 	 
+ 	 	List <Actor> LstA = new ArrayList<Actor>(); 
+ 	 	LstA.add(DW); 
+ 	 	LstA.add(AS);  	 	LstA.add(CB); 
+ 	 	LstA.add(NP); 
+ 	 	 
+ 	 	Movie TrueLies = new Movie("TrueLies",LstA); 
+ 	 	 
+ 	 	List <Movie> LstM = new ArrayList<Movie>(); 
+ 	 	LstM.add(TrueLies); 
+ 	 	Store_Movies (LstM); 
+ 	} 
+ 	 
+ 	private void Store_Movies (List <Movie> lm) {  	 	for (Movie M: lm) { 
+ 	 	 	MovieMap.put(M.getTitle(),M); 
+ 	 	} 
+ 	} 
+ 	 
+ 	public Movie getMovie(String n) {  	 	return MovieMap.get(n); 
+ 	} 
+ 	 
+/* List and ArrayList are the members of Collection framework. List is a collection of elements in a sequence where each element is an Object and elements are accessed by there position (index). ArrayList creates a dynamic array of Objects that increases or reduces in size whenever required. The primary difference between List and ArrayList is that  List is an Interface and ArrayList is a class. The ArrayList class is used to create the dynamic arrays that grow and shrunk whenever required. The list created using ArrayList class is nothing but the array of Objects. In Java, the standard array has the fixed length, so, you must know the size of the array in advance. But, it may be the case that you may not know what length of the array you need until the run time. Hence, Collection framework introduced the ArrayList class to overcome this issue. 
+ 	ArrayList has constructors that create the array with its intial capacity. Though the capacity of the Object of class ArrayList increases automatically when elements are added to the array, still you can manually increase the capacity of the Object of ArrayList using the Method ensureCapacity(). It is better to increase the capacity of array initially instead of reallocating the memory later. Because reallocation is costlier than allocating the memory at once. */ 
+ 	 
+ 	public List<Movie> getMovies() { 
+ 	 	List<Movie> LstMovies = new ArrayList<Movie>();  	 	Set<String> Keys = MovieMap.keySet();  	 	for (String K : Keys) { 
+ 	 	 	LstMovies.add(MovieMap.get(K)); 
+ 	 	} 
+ 	 	return LstMovies; 
+ 	} 	 	 
+} // CLASS 
+ 
+Movies.java 
+ 
+package WS; 
+ 
+import java.util.List; import javax.jws.WebService; 
+import javax.jws.WebMethod; 
+ 
+@WebService 
+public class Movies { 
+ 	 
+ 	private MoviesUtility MvUtils; 
+ 	 
+ 	public Movies () { 
+ 	 	MvUtils = new MoviesUtility(); 
+ 	 	MvUtils.create_Festival(); 
+ 	} 
+ 	 
+ 	@WebMethod 
+ 	public Movie getMovie(String n) { 
+ 	 	return MvUtils.getMovie(n); 
+ 	} 
+ 	 
+ 	@WebMethod 
+ 	public List<Movie> getMovies() { 
+ 	 	return MvUtils.getMovies(); 
+ 	} 
+} 
+MoviesPblshr.java 
+ 
+package WS; 
+ 
+import javax.xml.ws.Endpoint; 
+ 
+class MoviesPblshr { 
+ 	 
+ 	public static void main (String[] args) { 
+ 	 	 
+ 	 	int iPort = 8888; 
+ 	 	String sURL = "http://localhost:" + iPort + "/Movies"; 
+ 	 	System.out.println ("Publishing Movies on Port " + iPort + "..."); 
+ 	 	Endpoint.publish(sURL, new Movies()); 
+ 	 	System.out.println ("...Done."); 
+ 	} 
+} 
+ 
+ 
+MovieClient.java 
+ 
+// MyAutoPckg: new Package that will be created inside WS. 
+ 
+import MyAutoPckg.MoviesService; import MyAutoPckg.Movies; import MyAutoPckg.Movie; 
+import MyAutoPckg.Actor; 
+ 
+import java.util.List; 
+ 
+public class MovieClient { 
+ 	 
+ 	public static void main (String[] args) 
+ 	{ 
+ 	 	MoviesService srvc =  new MoviesService(); 
+ 	 	Movies port = srvc.getMoviesPort(); 
+ 	 	List<Movie> lstMovies = port.getMovies(); 
+ 	 	 
+ 	 	for (Movie M: lstMovies) { 
+ 	 	 	System.out.println("Movie: " + M.getTitle() + ", Roster-Count: " + 
+M.getRosterCount()); 
+ 	 	 	for (Actor A: M.getActors()) { 
+ 	 	 	 	System.out.println("Actor: " + A.getNickName()); 
+ 	 	 	} 
+ 	 	} 
+ 	} 
+} 
+ 
+ 
+ 
+ 
+ 
+ 
+1.	Remove the MovieClient.java from the package WS temporarily. 
+ 
+  
+ 
+2.	i. Get inside the Package folder (WS). Compile all the remaining Files using the command: 
+javac -d . *,java 
+ 
+Use the -d directory option to specify where the compiler puts the generated .class files. The Dot .  stands for current Directory. 
+NOTES: 
+?	The compiler will complain if the specified directory does not exist, and it won’t create one. 
+?	If the source file is under a package, the compiler will create package structure in the destination directory. 
+So, since all the source Files are inside the WS package, the compiler will create package WS in the destination directory (WS). 
+ 
+ii.	Run  the wsgen command as follows. -cp stands for classpath. The Dot . again stands for current Directory. Here WS.Movies is the Target Class. 
+ 
+iii.	Publish the Web-Service. 
+ 
+  
+ 
+3.	A Package of the same name (WS) with JAX-WS Folder inside it is created and added. 
+ 
+  
+4.	Inside the newly created Package. 
+ 
+  
+ 
+5.	Inside the jax-ws Package. 
+ 
+  
+ 
+ 
+ 
+6.	Run the wsimport command in a separate Window as below: 
+  
+ 
+ 
+7.	The Package named in the wsimport command (Here: MyAutoPckg) is created and added to the original Web-Service Folder WS.  
+ 
+  
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+8.	Contents of MyAutoPckg. 
+  
+ 
+9.	Add back the MovieClient.java file. 
+ 
+  
+10.	Compile and run it for the final Output. 
+ 
+  
+ 
+ 
+11.	WSDL Output: 
+ 
+  
+ 
+PRACTICAL 03: 
+
+Aim: Develop a Web-Service in Java that returns Matrix Multiplication by Strassen’s Algorithm. Two Matrices will be entered at runtime by the Client. Server calculates the output and returns it to the Client.
+ 
+Interface: IStrassenAlgo.java 
+ 
+package NtPd; 
+ 
+import javax.jws.WebService; import javax.jws.WebMethod; import javax.jws.soap.SOAPBinding; 
+import javax.jws.soap.SOAPBinding.Style; 
+ 
+@WebService // This signals that this is a Service Endpoint Interface (SEI) 
+@SOAPBinding(style = Style.RPC) public interface IStrassenAlgo 
+{ 
+	 	@WebMethod // This signals that this method is a service operation 
+	 	String MultiplyByStrassen(String sMsg); 
+} 
+ 
+ 
+StrassenServerImpl.java 
+ 
+package NtPd; 
+ 
+import javax.jws.WebService; // Service Implementation Bean (SIB) 
+@WebService(endpointInterface = "NtPd.IStrassenAlgo") public class StrassenServerImpl implements IStrassenAlgo 
+{ 
+public int[][] multiply(int[][] A, int[][] B) 
+{ 
+int n = A.length; int[][] R = new int[n][n]; if (n == 1) 
+{ 
+	 	R[0][0] = A[0][0] * B[0][0]; 
+} else { 
+int[][] A11 = new int[n / 2][n / 2]; int[][] A12 = new int[n / 2][n / 2]; int[][] A21 = new int[n / 2][n / 2]; int[][] A22 = new int[n / 2][n / 2]; int[][] B11 = new int[n / 2][n / 2]; int[][] B12 = new int[n / 2][n / 2]; int[][] B21 = new int[n / 2][n / 2]; int[][] B22 = new int[n / 2][n / 2]; 
+ 
+split(A, A11, 0, 0); split(A, A12, 0, n / 2); split(A, A21, n / 2, 0); 
+split(A, A22, n / 2, n / 2); 
+ 
+split(B, B11, 0, 0); split(B, B12, 0, n / 2); split(B, B21, n / 2, 0); 
+split(B, B22, n / 2, n / 2); 
+ 
+/* 
+*	M1 = (A11 + A22)(B11 + B22) M2 = (A21 + A22) B11 M3 = A11 (B12 - 
+*	B22) M4 = A22 (B21 - B11) M5 = (A11 + A12) B22 M6 = (A21 - A11) 
+*	(B11 + B12) M7 = (A12 - A22) (B21 + B22) 
+*	*/ 
+int[][] M1 = multiply(add(A11, A22), add(B11, B22)); int[][] M2 = multiply(add(A21, A22), B11); int[][] M3 = multiply(A11, subtract(B12, B22)); int[][] M4 = multiply(A22, subtract(B21, B11)); int[][] M5 = multiply(add(A11, A12), B22); int[][] M6 = multiply(subtract(A21, A11), add(B11, B12)); int[][] M7 = multiply(subtract(A12, A22), add(B21, B22)); 
+/** 
+*	C11 = M1 + M4 - M5 + M7 C12 = M3 + M5 C21 = M2 + M4 C22 = M1 - M2 
+*	+ M3 + M6 
+*	*/ 
+int[][] C11 = add(subtract(add(M1, M4), M5), M7); int[][] C12 = add(M3, M5); int[][] C21 = add(M2, M4); 
+int[][] C22 = add(subtract(add(M1, M3), M2), M6); 
+/** 
+*	join 4 halves into one result matrix * 
+*/ join(C11, R, 0, 0); join(C12, R, 0, n / 2); join(C21, R, n / 2, 0); join(C22, R, n / 2, n / 2); 
+} 
+ 
+return R; 
+} 
+ 
+public int[][] subtract(int[][] A, int[][] B) 
+{ int n = A.length; int[][] C = new int[n][n]; for (int i = 0; i < n; i++) 
+{ 
+for (int j = 0; j < n; j++) 
+{ 
+C[i][j] = A[i][j] - B[i][j]; 
+} 
+} 
+return C; } 
+/** 
+* Funtion to add two matrices * 
+*/ 
+public int[][] add(int[][] A, int[][] B) 
+{ int n = A.length; int[][] C = new int[n][n]; for (int i = 0; i < n; i++) 
+{ 
+for (int j = 0; j < n; j++) 
+{ 
+C[i][j] = A[i][j] + B[i][j]; 
+} } return C; } 
+/** 
+* Funtion to split parent matrix into child matrices * 
+*/ 
+public void split(int[][] P, int[][] C, int iB, int jB) 
+{ 
+for (int i1 = 0, i2 = iB; i1 < C.length; i1++, i2++) 
+{ 
+for (int j1 = 0, j2 = jB; j1 < C.length; j1++, j2++) 
+{ 
+C[i1][j1] = P[i2][j2]; 
+} 
+} 
+} 
+/** 
+* Funtion to join child matrices intp parent matrix * 
+*/ 
+public void join(int[][] C, int[][] P, int iB, int jB) 
+{ 
+for (int i1 = 0, i2 = iB; i1 < C.length; i1++, i2++) 
+{ 
+for (int j1 = 0, j2 = jB; j1 < C.length; j1++, j2++) 
+{ 
+P[i2][j2] = C[i1][j1]; 
+} 
+} } 
+public String MultiplyByStrassen(String sreq) 
+{ 
+String MatrixC = ""; 
+System.out.println("Server: MultiplyByStrassen() invoked..."); System.out.println("Server: Message > " + sreq); int idx = sreq.indexOf(","); 
+int N = Integer.parseInt(sreq.substring(0, idx)); System.out.println("N=" + N); int t = 0; 
+int[][] A = new int[N][N]; int[][] B = new int[N][N]; int[][] C = new int[N][N]; for (int i = 0; i < N; i++) 
+{ 
+for (int j = 0; j < N; j++) 
+{ 
+int from = sreq.indexOf(',', t); int to = sreq.indexOf(',', from + 1); 
+A[i][j] = Integer.parseInt(sreq.substring(from + 1, to)); t = to; } } 
+for (int i = 0; i < N; i++) 
+{ 
+for (int j = 0; j < N; j++) 
+{ 
+int from = sreq.indexOf(',', t); int to = sreq.indexOf(',', from + 1); 
+B[i][j] = Integer.parseInt(sreq.substring(from + 1, to)); t = to; } } 
+int[][] MAT = multiply(A, B); StringBuilder MatC = new StringBuilder(); 
+MatC.append(N + ","); for (int i = 0; i < N; i++) 
+{ 
+for (int j = 0; j < N; j++) 
+{ 
+//System.out.print(C[i][j] + " "); MatC.append(MAT[i][j]); if (i == N - 1 && j == N - 1) 
+{ 
+MatC.append(""); 
+} else 
+{ 
+MatC.append(","); 
+} 
+} 
+System.out.println(); 
+} 
+MatrixC = MatC.toString(); return (MatrixC); 
+} 
+} 
+ 
+StrassenServerPublisher.java 
+ 
+package NtPd; 
+ 
+import javax.xml.ws.Endpoint; 
+ 
+//Service Publisher Class public class StrassenServerPublisher 
+{ 
+	 	public static void main(String[] args) { 
+	 	 	 	// 1st argument is the publicaNon URL 
+	 	 	 	// 2nd argument is an SIB instance 
+	 	 	 	Endpoint.publish("http://localhost:9876/NtPd", new 
+StrassenServerImpl()); 
+	 	 	 	System.out.print("Server Published."); 
+	 	} 
+} 
+ 
+StrassenClient.java 
+ 
+package NtPd; 
+ 
+import javax.xml.namespace.QName; import javax.xml.ws.Service; import java.net.URL; class StrassenClient 
+{ 
+public static void main(String argv[]) throws Exception 
+{ 
+long start, finish, difference; if (argv.length < 1) 
+{ 
+System.out.println("Usage: java StrassenClient \"N,matrix elements separated by ,\""); System.exit(1); 
+} 
+String strMsg = argv[0]; 
+URL url = new URL("http://localhost:9876/NtPd?wsdl"); // Qualified name of the service: 
+// 1st arg is the service URI 
+// 2nd is the service name published in the WSDL 
+QName qname = new QName("http://NtPd/", "StrassenServerImplService"); 
+Service service = Service.create(url, qname); 
+// Extract the endpoint interface, the service "port". IStrassenAlgo eif = service.getPort(IStrassenAlgo.class); start = System.currentTimeMillis(); String sreq = eif.MultiplyByStrassen(strMsg); finish = System.currentTimeMillis(); sreq = sreq + ","; int idx = sreq.indexOf(","); 
+int N = Integer.parseInt(sreq.substring(0, idx)); int t = 0; 
+int[][] C = new int[N][N]; for (int i = 0; i < N; i++) 
+{ 
+for (int j = 0; j < N; j++) 
+{ 
+int from = sreq.indexOf(',', t); int to = sreq.indexOf(',', from + 1); C[i][j] = Integer.parseInt(sreq.substring(from + 1, to)); t = to; 
+} 
+} 
+System.out.println("\nMatrix Multiplication is ...\n"); for (int i = 0; i < N; i++) 
+{ 
+for (int j = 0; j < N; j++) 
+{ 
+System.out.print(C[i][j] + " "); 
+} 
+System.out.println(); 
+} 
+difference = finish - start; 
+System.out.println("Time required for matrix multiplication (Using Strassen algorithm) :"); System.out.println(difference + " milli seconds"); 
+} 
+} 
+ 
+Output 
+ 
+1.	Compiling and publishing the Server. 
+ 
+  
+ 
+2.	Input at the Client. 
+  
+3.	At the Server. 
+ 
+ 
+ 
+  	 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+PRACTICAL 04:
+
+Aim: Demonstrate CRUD Operations with suitable Database using SOAP or RESTful Web-Service.
+
+ 
+Creating a Database 
+ 
+1.	Create a New Connection in the Databases. 
+ 
+  
+ 
+2.	Connect to the Databases using that Connection. 
+ 
+  
+3.	Create a New Database. 
+ 
+  
+ 
+4.	Provide Details. 
+ 
+  
+ 
+ 
+ 
+ 
+5.	Newly created Database. 
+ 
+  
+ 
+6.	Connect to it. 
+ 
+  
+ 
+ 
+ 
+ 
+ 
+ 
+7.	Open the .sql Database File. 
+ 
+  
+ 
+8.	Script opens up. 
+ 
+  
+ 
+ 
+ 
+ 
+9.	Select the newly created Connection from the dropdown List and execute the SQL script. 
+  
+ 
+10.	Tables are created. 
+ 
+  
+11.	Refresh the Schema. 
+  
+ 
+12.	View the Data. 
+  
+13.	Run Select Query for Players Table and repeat the same for Teams table. 
+  
+ 
+ 
+Creating a Web Application 
+ 
+1.	Create a new Java Web Application. 
+ 
+  
+ 
+ 
+ 
+2.	Provide Details. 
+ 
+  
+ 
+3.	Select Server. 
+  
+4.	Run the Project. 
+  
+ 
+5.	Create RESTful Web Service from Database. 
+  
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+  
+6.	Choose a New Datasource. Here it will be the Database Connection we created. 
+ 
+ 
+7.	Select all the newly created Tables. 
+  
+ 
+8.	Provide a suitable Package Name. 
+  
+9.	Provide a suitable Resource Package Name. 
+  
+ 
+10.	Verify the Entity Classes and the RESTful Web-Services 
+  
+11.	Test the RESTful Web-Services. 
+ 
+  
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+12.	Configure the Client. Select web Test Client in Project  and click Browse. 
+ 
+  
+ 
+13.	Select the Web-Service Application. 
+  
+ 
+14.	Target folder gets set. Click OK. 
+  
+ 
+15.	Run the WS Link in Browser for Output. The Browser displays your application, with a link for each of the Web Services 
+  
+ 
+ 
+ 
+ 
+ 
+
+ 
+ 
+PRACTICAL 05:
+
+Aim: Develop a Micro-Blogger Application using RESTful Web-Services.
+ 
+1. Create a New Java Web Application. 
+  
+3.	Create Source Package Folders: pBusiness, pException, pModel, pWeb 
+ 
+  
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+4.	Create one Interface Constants.java and three Java Classes MessageBO.java, TestBO_OLD.java and UserBO.java in pBusiness Package. 
+ 
+  
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+  
+ 
+5.	Add Code  to the Classes. 
+ 
+Constants.java 
+ 
+package pBusiness; 
+ 
+/** 
+ * 
+ * @author Anand 
+ */ 
+ 
+public interface Constants 
+{ 
+public static final String DB_NAME = "c:\\temp\\db2.data"; 
+} 
+ 
+ 
+ 
+ 
+Constants.java 
+ 
+package pBusiness; 
+ 
+import java.util.ArrayList; import java.util.List; 
+import pModel.MessageVO; import pModel.UserVO; import pModel.XMLUtil; import com.db4o.Db4o; import com.db4o.ObjectContainer; import com.db4o.ObjectSet; import com.db4o.query.Predicate; import pException.InvalidXMLException; import pException.ItemNotFoundException; 
+import pException.UserNotFoundException; 
+ 
+/** 
+ * 
+ * @author Anand 
+ */ 
+ 
+public class MessageBO 
+{ 
+private MessageBO() 
+{ } 
+public static String create(String xml) throws InvalidXMLException, 
+UserNotFoundException 
+{ 
+ObjectContainer db = null; 
+try 
+{ 
+db = Db4o.openFile(Constants.DB_NAME); 
+MessageVO messageVO = XMLUtil.getMessageVOFromXML(xml); if (messageVO != null) 
+{ 
+// Add message only if user is registered 
+if (UserBO.query(db, messageVO.getUserVO().getUsername(), messageVO.getUserVO().getPassword()) != null) 
+{ 
+db.store(messageVO); 
+return messageVO.toXML(); 
+} else 
+{ 
+throw new UserNotFoundException(); 
+} } else 
+{ 
+throw new InvalidXMLException(); 
+} 
+} finally { 
+if (db != null) 
+{ db.close(); 
+} 
+} } 
+private static List<MessageVO> getAllForUser(final String username){ ObjectContainer db = null; List<MessageVO> list = null; try 
+{ 
+db = Db4o.openFile(Constants.DB_NAME); 
+// Check that user exists 
+final UserVO userVO = UserBO.query(db, username); if (userVO == null) 
+{ 
+return new ArrayList<MessageVO>(); 
+} 
+list = db.query(new Predicate<MessageVO>() 
+{ 
+public boolean match(MessageVO messageVO) 
+{ 
+return (messageVO.getUserVO().getUsername().equals(username)); 
+} 
+} 
+); 
+ArrayList<MessageVO> newList = new ArrayList<MessageVO>(); for (MessageVO vo : list) 
+{ 
+newList.add(vo); 
+} 
+return (list == null) ? new ArrayList<MessageVO>() : newList; 
+} finally { 
+if (db != null) 
+{ db.close(); 
+} 
+} } 
+public static String getAllXMLForUser(String username) 
+{ 
+return getAllXMLStructure(getAllForUser(username)); 
+} 
+public static String getAllJSONForUser(String username) 
+{ 
+return getAllJSONStructure(getAllForUser(username)); 
+} 
+private static List<MessageVO> searchMessages(final String search_item) { 
+ObjectContainer db = null; List<MessageVO> list = null; try { 
+db = Db4o.openFile(Constants.DB_NAME); list = db.query(new Predicate<MessageVO>() 
+{ 
+public boolean match(MessageVO messageVO) 
+{ 
+return messageVO.getContent().contains(search_item); 
+} 
+} 
+); 
+ArrayList<MessageVO> newList = new ArrayList<MessageVO>(); for (MessageVO vo : list) 
+{ 
+newList.add(vo); 
+} 
+return (list == null) ? new ArrayList<MessageVO>() : newList; 
+} finally { 
+if (db != null) 
+{ db.close(); 
+} 
+} } 
+private static String getAllXMLStructure(List<MessageVO> result) 
+{ 
+StringBuilder users = new StringBuilder(); users.append("<messages>"); 
+users.append("<count>").append(result.size()).append("</count>"); for (MessageVO vo : result) 
+{ 
+users.append(vo.toXML()); 
+} 
+users.append("</messages>"); return users.toString(); 
+} 
+// Declared final because of inner class access public static String searchAllXML(String search_item) 
+{ 
+return getAllXMLStructure(searchMessages(search_item)); 
+} 
+private static String getAllJSONStructure(List<MessageVO> result) 
+{ 
+StringBuilder messages = new StringBuilder();int size = result.size(); messages.append("{\"messages-result\":{\"count\":\"").append(size).append("\", 
+\"messages\":["); for (int i = 0; i < size; i++) 
+{ 
+messages.append(result.get(i).toJSON()); 
+if (i + 1 < size) 
+{ 
+messages.append(","); 
+} } 
+messages.append("]}}"); return messages.toString(); 
+} 
+public static String searchAllJSON(String search_item) 
+{ 
+return getAllJSONStructure(searchMessages(search_item)); 
+} 
+public static String getAllXML() 
+{ 
+ObjectContainer db = null; 
+try 
+{ 
+db = Db4o.openFile(Constants.DB_NAME); 
+// Refer to Chapter 4 for the specific structure StringBuilder users = new StringBuilder(); users.append("<messages>"); 
+ObjectSet<MessageVO> result = db.queryByExample(MessageVO.class); users.append("<count>").append(result.size()).append("</count>"); while (result.hasNext()) 
+{ 
+users.append(result.next().toXML()); 
+} 
+users.append("</messages>"); return users.toString(); 
+} finally { 
+if (db != null) 
+{ db.close(); 
+} 
+} } 
+public static String getAllJSON() {ObjectContainer db = null; 
+try 
+{ 
+db = Db4o.openFile(Constants.DB_NAME); 
+// Refer to Chapter 4 for the specific structure 
+StringBuilder messages = new StringBuilder(); 
+ObjectSet<MessageVO> result = db.queryByExample(MessageVO.class); 
+messages.append("{\"messages-result\":{\"count\":\"").append(result.size()).append("\", 
+\"messages\":["); while (result.hasNext()) 
+{ 
+messages.append(result.next().toJSON()); if (result.hasNext()) 
+{ 
+messages.append(","); 
+} } 
+messages.append("]}}"); return messages.toString(); 
+} finally { 
+if (db != null) 
+{ db.close(); 
+} 
+} 
+} 
+private static MessageVO queryMessage(ObjectContainer db, String messageID) { ObjectSet<MessageVO> result = db.queryByExample(new MessageVO(messageID)); if (result.hasNext()) 
+{ 
+return result.next(); 
+} else { return null; 
+} 
+} 
+private static MessageVO queryMessage(String messageID) 
+{ 
+ObjectContainer db = null; 
+try 
+{ 
+db = Db4o.openFile(Constants.DB_NAME); 
+ObjectSet<MessageVO> result = db.queryByExample(new MessageVO(messageID));if (result.hasNext()) 
+{ 
+return result.next(); 
+} else { return null; 
+} } finally { 
+if (db != null) 
+{ db.close(); 
+} 
+} } 
+public static String getXML(String messageID) 
+{ 
+MessageVO messageVO = queryMessage(messageID); return (messageVO != null) ? messageVO.toXML() : null; } 
+public static String getJSON(String messageID) 
+{ 
+MessageVO messageVO = queryMessage(messageID); return (messageVO != null) ? messageVO.toJSON() : null; 
+} 
+public static void delete(String messageID) throws ItemNotFoundException { ObjectContainer db = null; 
+try 
+{ 
+db = Db4o.openFile(Constants.DB_NAME); 
+// Check that message for messageID exists 
+MessageVO messageVO = queryMessage(db, messageID); if (messageVO != null) 
+{ 
+db.delete(messageVO); 
+} else 
+{ 
+throw new ItemNotFoundException(); 
+} } finally{ if (db != null) 
+{ db.close(); 
+} 
+} 
+} 
+} 
+ 
+ 
+TestBO_OLD.java 
+ 
+package pBusiness; 
+ 
+/** 
+ * 
+ * @author Anand 
+ */ 
+ 
+import pException.InvalidXMLException; import pException.ItemAlreadyExistsException; import pException.ItemNotFoundException; 
+import pException.UserNotFoundException; 
+ 
+public class TestBO_OLD 
+{ 
+public static void main(String[] args) throws InvalidXMLException, 
+ItemAlreadyExistsException, ItemNotFoundException, UserNotFoundException 
+{ 
+/*String userXML = 
+"<user><username>Girish</username><password>girish</password></user>"; UserBO.create(userXML); 
+userXML = "<user><username>Athu</username><password>athu</password></user>"; 
+UserBO.create(userXML); userXML = 
+"<user><username>Sangeeta</username><password>sangeeta</password></user>"; UserBO.create(userXML); 
+userXML = "<user><username>Gauri</username><password>gauri</password></user>"; 
+UserBO.create(userXML); userXML = 
+"<user><username>Nayana</username><password>nayana</password></user>"; 
+UserBO.create(userXML); 
+*/ 
+System.out.println(UserBO.getXML("Girish")); 
+System.out.println(UserBO.getJSON("Girish")); 
+System.out.println(UserBO.getAllXML()); 
+System.out.println(UserBO.getAllJSON()); 
+System.out.println("----------------"); 
+String messageXML = "<message>" 
++ "<messageID></messageID>" 
+        + "<content>How are you?</content>" 
++ "<link></link>" 
++ "<user>" 
++ "<username>Athu</username>" 
++ "<password>athu</password>" 
++ "<link>users/Athu</link>" 
++ "</user>" 
++ "</message>"; 
+MessageBO.create(messageXML); 
+System.out.println("----------------"); 
+System.out.println(MessageBO.getAllXML()); 
+System.out.println("----------------"); 
+System.out.println(MessageBO.getAllJSON()); 
+System.out.println("----------------"); 
+System.out.println(MessageBO.getAllXMLForUser("Girish")); 
+System.out.println(MessageBO.getAllJSONForUser("Girish")); 
+System.out.println("----------------"); 
+System.out.println(MessageBO.searchAllXML("How")); 
+} 
+} 
+ 
+UserBO.java 
+ 
+package pBusiness; 
+/** 
+ * 
+ * @author Anand 
+ */ 
+import pModel.UserVO; import pModel.XMLUtil; import com.db4o.Db4o; import com.db4o.ObjectContainer; import com.db4o.ObjectSet; import pException.InvalidXMLException; import pException.ItemAlreadyExistsException; 
+import pException.ItemNotFoundException; 
+ 
+public class UserBO 
+{ 
+private UserBO() 
+{ } 
+public static String create(String xml) throws InvalidXMLException, 
+ItemAlreadyExistsException 
+{ 
+ObjectContainer db = null; 
+try 
+{db = Db4o.openFile(Constants.DB_NAME); UserVO userVO = XMLUtil.getUserVOFromXML(xml); 
+if (userVO != null) 
+{ 
+// Check if user exists in our DB: if not, create; else, throw 
+// exception 
+if (query(db, userVO.getUsername()) == null) 
+{ db.store(userVO); 
+return userVO.toXML(); 
+} else { 
+throw new ItemAlreadyExistsException(); 
+} } else 
+{ 
+throw new InvalidXMLException(); 
+} } finally { if (db != null) { db.close(); 
+} 
+} } 
+public static String getAllXML() 
+{ 
+ObjectContainer db = null; 
+try 
+{ 
+db = Db4o.openFile(Constants.DB_NAME); 
+// Refer to Chapter 4 for the specific structure StringBuilder users = new StringBuilder(); users.append("<users>"); 
+ObjectSet<UserVO> result = db.queryByExample(UserVO.class); users.append("<count>").append(result.size()).append("</count>"); while (result.hasNext()) 
+{ 
+users.append(result.next().toXML()); 
+} 
+users.append("</users>"); return users.toString(); 
+} finally { 
+if (db != null) 
+{ db.close(); 
+} 
+} } 
+public static String getAllJSON() 
+{ 
+// Refer to Chapter 4 for the specific structure ObjectContainer db = null; 
+try 
+{ 
+db = Db4o.openFile(Constants.DB_NAME); 
+StringBuilder users = new StringBuilder(); 
+ObjectSet<UserVO> result = db.queryByExample(UserVO.class); 
+users.append("{\"users-result\":{\"count\":\"").append(result.size()).append("\", \"users\":["); while (result.hasNext()) 
+{ 
+users.append(result.next().toJSON()); if (result.hasNext()) 
+{ 
+users.append(","); 
+} } 
+users.append("]}}"); return users.toString(); 
+} finally { 
+if (db != null) 
+{ db.close(); 
+} 
+} } 
+protected static UserVO query(String username) 
+{ 
+ObjectContainer db = null; 
+try 
+{db = Db4o.openFile(Constants.DB_NAME); 
+ObjectSet<UserVO> result = db.queryByExample(new UserVO(username)); if (result.hasNext()) 
+{ 
+return result.next(); 
+} else { return null; 
+} } finally { 
+if (db != null) 
+{ db.close(); 
+} 
+} } 
+protected static UserVO query(ObjectContainer db, String username) 
+{ 
+return query(db, username, null); 
+} 
+protected static UserVO query(ObjectContainer db, String username, String password) 
+{ 
+ObjectSet<UserVO> result = db.queryByExample(new UserVO(username, password)); if (result.hasNext()) 
+{ 
+return result.next(); 
+} else { return null; 
+} } 
+public static String getXML(String username) 
+{ 
+UserVO userVO = query(username); 
+return (userVO != null) ? userVO.toXML() : null; 
+} 
+public static String getJSON(String username) 
+{ 
+UserVO userVO = query(username); 
+return (userVO != null) ? userVO.toJSON() : null; 
+} 
+public static String update(String xml) throws InvalidXMLException, 
+ItemNotFoundException 
+{ 
+ObjectContainer db = null; 
+try 
+{ 
+db = Db4o.openFile(Constants.DB_NAME); UserVO userVO = XMLUtil.getUserVOFromXML(xml); if (userVO != null) 
+{ 
+// Check that user exists in our DB: if so, update; else, throw 
+// exception 
+UserVO tmpUser = query(db, userVO.getUsername()); 
+if (tmpUser != null) 
+{ 
+// We only let the user update the password tmpUser.setPassword(userVO.getPassword()); 
+db.store(tmpUser); 
+return tmpUser.toXML(); 
+} else 
+{ 
+throw new ItemNotFoundException(); 
+} } else 
+{ 
+throw new InvalidXMLException(); 
+} } finally { 
+if (db != null) { db.close(); 
+} 
+} } 
+public static void delete(String username) throws ItemNotFoundException 
+{ 
+ObjectContainer db = null; 
+try 
+{ 
+db = Db4o.openFile(Constants.DB_NAME); 
+// Check that user for username exists UserVO userVO = query(db, username); if (userVO != null) 
+{ 
+db.delete(userVO); 
+} else 
+{ 
+throw new ItemNotFoundException(); 
+} } finally { 
+if (db != null) { db.close(); 
+} 
+} 
+} 
+} 
+ 
+ 
+6.	Add four Exception Classes to the pException package: InvalidXMLException.java, 
+ItemAlreadyExistsException.java, ItemNotFoundException.java and UserNotFoundException.java’ 
+ 
+  
+ 
+7.	Extend them all from the standard Exception Class. Eg: public class InvalidXMLException extends Exception{ } 
+8.	Add three Classes to the pModel Package. 
+ 
+  
+ 
+9.	Add Codes to them. 
+ 
+MessageVO.java 
+ 
+package pModel; 
+ 
+import java.util.UUID; 
+ 
+/** 
+ * 
+ * @author Anand 
+ */ 
+ 
+public class MessageVO 
+{ 
+private String messageID; private String content; private UserVO userVO; 
+public MessageVO() 
+{ 
+super(); 
+this.messageID = UUID.randomUUID().toString(); 
+} 
+public MessageVO(String messageID) 
+{ super(); 
+this.messageID = messageID; 
+} 
+public MessageVO(String content, UserVO userVO) 
+{ 
+super();this.content = content; this.userVO = userVO; // Generate a unique id 
+this.messageID = UUID.randomUUID().toString(); 
+} 
+public String getContent() 
+{ return content; } 
+public void setContent(String content) 
+{ 
+this.content = content; 
+} 
+public UserVO getUserVO() 
+{ return userVO; 
+} 
+public void setUserVO(UserVO userVO) 
+{ 
+this.userVO = userVO; 
+} 
+public String toXML() 
+{ 
+StringBuilder xml = new StringBuilder(); xml.append("<message>"); 
+xml.append("<messageID>").append(messageID).append("</messageID>"); xml.append("<content>").append(content).append("</content>"); xml.append("<link>").append(getLink()).append("</link>"); xml.append(userVO.toXML()); xml.append("</message>"); return xml.toString(); 
+} 
+public String toJSON() 
+{ 
+StringBuilder json = new StringBuilder(); 
+json.append("{\"message\":{\"messageID\":\"").append(messageID).append("\", \"content\":\"").append(content).append("\", \"link\":\"").append(getLink()).append("\", 
+\"").append(userVO.toJSON()).append("}}"); return json.toString(); 
+} 
+public String getMessageID() 
+{ 
+return messageID; 
+} 
+public void setMessageID(String messageID) 
+{this.messageID = messageID; 
+} 
+private String getLink() 
+{ 
+return "/messages/" + messageID; 
+} 
+} 
+ 
+UserVO.java 
+ 
+package pModel; 
+ 
+/** 
+ * 
+ * @author Anand 
+ */ 
+public class UserVO 
+{ 
+private String username; private String password; 
+public UserVO() 
+{ super(); } 
+public UserVO(String username) 
+{ 
+this.username = username; 
+} 
+public UserVO(String username, String password) 
+{ super(); this.username = username; this.password = password; 
+} 
+public String getUsername() 
+{ 
+return username; 
+} 
+public void setUsername(String username) 
+{ 
+this.username = username; 
+} 
+public String getPassword() 
+{ 
+return password; 
+} 
+public void setPassword(String password) 
+{ 
+this.password = password; 
+} 
+public String toXML(){ 
+StringBuilder xml = new StringBuilder(); xml.append("<user>"); 
+xml.append("<username>").append(username).append("</username>"); xml.append("<password>").append(password).append("</password>"); xml.append("<link>").append(getLink()).append("</link>"); xml.append("</user>"); return xml.toString(); 
+} 
+public String toJSON() 
+{ 
+StringBuilder json = new StringBuilder(); 
+json.append("{\"user\":{\"username\":\"").append(username).append("\", 
+\"password\":\"").append(password).append("\", \"link\":\"").append(getLink()).append("\"}}"); return json.toString(); 
+} 
+private String getLink() 
+{ 
+return "/users/" + username; 
+} 
+} 
+ 
+XMLUtil.java 
+ 
+package pModel; 
+ 
+/** 
+ * 
+ * @author Anand 
+ */ 
+import java.io.IOException; import java.io.StringReader; 
+import javax.xml.parsers.DocumentBuilderFactory; 
+import javax.xml.parsers.ParserConfigurationException; import org.w3c.dom.Document; import org.w3c.dom.Element; import org.w3c.dom.NodeList; import org.xml.sax.InputSource; 
+import org.xml.sax.SAXException; 
+ 
+public class XMLUtil 
+{ 
+private XMLUtil() 
+{ } 
+private static Document getDocument(String xml) 
+{ try 
+{ 
+// Create a builder factory 
+DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance(); factory.setNamespaceAware(true);return factory.newDocumentBuilder().parse(new InputSource(new StringReader(xml))); 
+} 
+catch (SAXException e) 
+{ return null; } 
+catch (ParserConfigurationException e) 
+{ return null; } 
+catch (IOException e) 
+{ return null; 
+} 
+} 
+private static boolean validateUserXML(Document doc) 
+{ 
+NodeList nodeList = null; 
+// Check the elements and values exist nodeList = doc.getElementsByTagName("user"); if (nodeList.getLength() != 1) 
+{ return false; 
+} 
+// Check that email element exists 
+nodeList = doc.getElementsByTagName("username"); if (nodeList.getLength() != 1) 
+{ return false; 
+} 
+// Check that value is not null or empty 
+String username = getValue((Element) doc.getElementsByTagName("user").item(0), 
+"username"); 
+if (username == null || username.isEmpty()) 
+{ 
+return false; 
+} 
+// Check that email element exists 
+nodeList = doc.getElementsByTagName("password"); if (nodeList.getLength() != 1) 
+{ 
+return false; 
+} 
+// Check that value is not null or empty 
+String password = getValue((Element) doc.getElementsByTagName("user").item(0), 
+"password"); 
+if (password == null || password.isEmpty()) 
+{ 
+return false; 
+} return true; } 
+private static String getValue(Element ele, String tagName) 
+{ 
+String value = null; 
+NodeList nl = ele.getElementsByTagName(tagName); if (nl != null && nl.getLength() > 0) 
+{ 
+Element el = (Element) nl.item(0); value = el.getFirstChild().getNodeValue(); 
+} 
+return value; 
+} 
+private static boolean validateMessageXML(Document doc, String xml) 
+{ 
+NodeList nodeList = null; 
+// Check the elements and values exist nodeList = doc.getElementsByTagName("message"); if (nodeList.getLength() != 1) 
+{ 
+return false; 
+} 
+// Check that email element exists 
+nodeList = doc.getElementsByTagName("content"); if (nodeList.getLength() != 1) 
+{ 
+return false; 
+} 
+// Check that value is not null or empty 
+String content = getValue((Element) doc.getElementsByTagName("message").item(0), 
+"content"); 
+if (content == null || content.isEmpty()) 
+{ 
+return false; 
+} 
+// Validate that user is part of the message XML return validateUserXML(doc); 
+} 
+public static UserVO getUserVOFromXML(String xml) 
+{Document doc = getDocument(xml); if (doc != null) 
+{ 
+if (validateUserXML(doc)) 
+{ 
+// XML is valid, just get the values from the DOM 
+return new UserVO(getValue((Element) doc.getElementsByTagName("user").item(0), 
+"username"), getValue((Element) doc.getElementsByTagName("user").item(0), 
+"password")); 
+} } return null; 
+} 
+public static MessageVO getMessageVOFromXML(String xml) 
+{ 
+Document doc = getDocument(xml); if (doc != null) 
+{ 
+if (validateMessageXML(doc, xml)) 
+{ 
+// XML is valid, just get the values from the DOM 
+UserVO userVO = new UserVO(getValue((Element) 
+doc.getElementsByTagName("user").item(0), "username"), getValue((Element) doc.getElementsByTagName("user").item(0), "password")); return new MessageVO(getValue((Element) 
+doc.getElementsByTagName("message").item(0), "content"), userVO); 
+} } return null; 
+} 
+} 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+10. Add se7en Classes to the pWeb Package: MessageResource.java, 
+MessagesResource.java, RESTfulJavaWebService.java, 
+SearchMessagesResource.java, UserMessagesResource.java, UserResource.java and UsersResource.java. 
+ 
+Add codes to them. 
+ 
+  
+ 
+MessageResource.java 
+ 
+/* 
+*	To change this license header, choose License Headers in Project Properties. 
+*	To change this template file, choose Tools | Templates  * and open the template in the editor. 
+ */ 
+package pWeb; 
+ 
+/** 
+ * 
+*	@author Anand 
+ */ 
+import org.restlet.data.MediaType; import org.restlet.data.Status; import org.restlet.representation.Representation; import org.restlet.representation.StringRepresentation; import org.restlet.resource.Delete; import org.restlet.resource.Get; import org.restlet.resource.ServerResource; import pBusiness.MessageBO; 
+import pException.ItemNotFoundException; 
+ 
+public class MessageResource extends ServerResource 
+{ 
+@Get("xml") 
+public Representation getXML() 
+{ 
+String messageID = (String) getRequest().getAttributes().get("messageID"); 
+StringRepresentation representation = null; 
+String xml = MessageBO.getXML(messageID); 
+representation = new StringRepresentation(xml, MediaType.APPLICATION_XML); if (xml != null) 
+{ 
+return representation; 
+} else 
+{ 
+setStatus(Status.CLIENT_ERROR_NOT_FOUND); return null; 
+} 
+} 
+@Get("json") 
+public Representation getJSON() 
+{ 
+String messageID = (String) getRequest().getAttributes().get("messageID"); 
+StringRepresentation representation = null; String json = MessageBO.getJSON(messageID); 
+representation = new StringRepresentation(json, MediaType.APPLICATION_JSON); if (json != null) 
+{ 
+return representation; 
+} else 
+{ 
+setStatus(Status.CLIENT_ERROR_NOT_FOUND); return null; 
+} 
+} 
+@Delete 
+public void deleteMessage() 
+{ 
+String messageID = (String)getRequest().getAttributes().get("messageID"); try 
+{ 
+MessageBO.delete(messageID); setStatus(Status.SUCCESS_NO_CONTENT); 
+} 
+catch (ItemNotFoundException e) 
+{ 
+setStatus(Status.CLIENT_ERROR_NOT_FOUND); 
+} 
+} 
+} 
+ 
+MessagesResource.java 
+ 
+package pWeb; 
+ 
+/** 
+ * 
+ * @author Anand 
+ */ 
+ 
+import java.io.IOException; 
+ 
+import org.restlet.data.MediaType; import org.restlet.data.Status; 
+import org.restlet.representation.Representation; import org.restlet.representation.StringRepresentation; import org.restlet.resource.Get; import org.restlet.resource.Post; import org.restlet.resource.ServerResource; import pBusiness.MessageBO; import pException.InvalidXMLException; 
+import pException.UserNotFoundException; 
+ 
+public class MessagesResource extends ServerResource 
+{ 
+@Get("xml") 
+public Representation getXML() 
+{ 
+String xml = MessageBO.getAllXML(); 
+Representation representation = new StringRepresentation(xml, MediaType.APPLICATION_XML); return representation; 
+} 
+@Get("json") 
+public Representation getJSON() 
+{ 
+String json = MessageBO.getAllJSON(); 
+Representation representation = new StringRepresentation(json, MediaType.APPLICATION_JSON); return representation; 
+} 
+@Post 
+public Representation createtMessage(Representation entity) 
+{ 
+Representation representation = null; try { 
+representation = new StringRepresentation(MessageBO.create(entity.getText()), MediaType.APPLICATION_XML); 
+} 
+catch (InvalidXMLException e) 
+{ 
+setStatus(Status.CLIENT_ERROR_BAD_REQUEST); 
+representation = new StringRepresentation("Invalid XML.", MediaType.TEXT_PLAIN); 
+} 
+catch(UserNotFoundException e) 
+{ 
+setStatus(Status.CLIENT_ERROR_NOT_FOUND); 
+} 
+catch (IOException e) 
+{ 
+setStatus(Status.SERVER_ERROR_INTERNAL); 
+} 
+return representation; 
+} 
+} 
+ 
+RESTfulJavaWebService.java 
+ 
+package pWeb; 
+ 
+/** 
+ * 
+ * @author Anand 
+ */ 
+import org.restlet.Application; import org.restlet.Context; import org.restlet.Restlet; 
+import org.restlet.routing.Router; 
+ 
+public class RESTfulJavaWebService extends Application 
+{ 
+public RESTfulJavaWebService(Context parentContext) 
+{ 
+super(parentContext); 
+} 
+@Override 
+public synchronized Restlet createInboundRoot() 
+{ 
+Router router = new Router(getContext()); 
+// Define routers for users 
+router.attach("/users", UsersResource.class); router.attach("/users/{username}", UserResource.class); 
+// Define routers for messages 
+router.attach("/messages", MessagesResource.class); router.attach("/messages/{messageID}", MessageResource.class); router.attach("/messages/users/{username}", UserMessagesResource.class); 
+// Searching URI 
+router.attach("/messages/search/{search_item}", SearchMessagesResource.class); return router; 
+} 
+} 
+ 
+SearchMessagesResource.java 
+ 
+package pWeb; 
+ 
+/** 
+ * 
+ * @author Anand 
+ */ 
+import org.restlet.data.MediaType; import org.restlet.representation.Representation; import org.restlet.representation.StringRepresentation; import org.restlet.resource.Get; import org.restlet.resource.ServerResource; import pBusiness.MessageBO; 
+ 
+public class SearchMessagesResource extends ServerResource 
+{ 
+@Get("xml") 
+public Representation getXML() 
+{ 
+String search_item = (String) getRequest().getAttributes().get("search_item"); 
+String xml = MessageBO.searchAllXML(search_item); 
+Representation representation = new StringRepresentation(xml, MediaType.APPLICATION_XML); return representation; 
+} 
+@Get("json") 
+public Representation getJSON() 
+{ 
+String search_item = (String) getRequest().getAttributes().get("search_item"); 
+String json = MessageBO.searchAllJSON(search_item); 
+Representation representation = new StringRepresentation(json, MediaType.APPLICATION_JSON); return representation; 
+} 
+} 
+ 
+UserMessagesResource.java 
+ 
+package pWeb; 
+ 
+/** 
+ * 
+ * @author Anand 
+ */ 
+import org.restlet.data.MediaType; import org.restlet.representation.Representation; import org.restlet.representation.StringRepresentation; import org.restlet.resource.Get; import org.restlet.resource.ServerResource; import pBusiness.MessageBO; 
+ 
+public class UserMessagesResource extends ServerResource { 
+@Get("xml") 
+public Representation getXML() 
+{ 
+String username = (String) getRequest().getAttributes().get("username"); String xml = MessageBO.getAllXMLForUser(username); 
+Representation representation = new StringRepresentation(xml, MediaType.APPLICATION_XML); return representation; 
+} 
+@Get("json") 
+public Representation getJSON() 
+{String username = (String) getRequest().getAttributes().get("username"); 
+String json = MessageBO.getAllJSONForUser(username); 
+Representation representation = new StringRepresentation(json, MediaType.APPLICATION_JSON); return representation; 
+} 
+} 
+ 
+UserResource.java 
+ 
+package pWeb; 
+ 
+/** 
+ * 
+ * @author Anand 
+ */ 
+import java.io.IOException; import org.restlet.data.MediaType; import org.restlet.data.Status; 
+import org.restlet.representation.Representation; import org.restlet.representation.StringRepresentation; import org.restlet.resource.Delete; import org.restlet.resource.Get; import org.restlet.resource.Put; import org.restlet.resource.ServerResource; import pBusiness.UserBO; 
+import pException.InvalidXMLException; 
+import pException.ItemNotFoundException; 
+ 
+public class UserResource extends ServerResource 
+{ 
+@Get("xml") 
+public Representation getXML() 
+{ 
+String username = (String) getRequest().getAttributes().get("username"); 
+StringRepresentation representation = null; String xml = UserBO.getXML(username); 
+representation = new StringRepresentation(xml, MediaType.APPLICATION_XML); if (xml != null) 
+{ 
+return representation; 
+} else { setStatus(Status.CLIENT_ERROR_NOT_FOUND); return null; 
+} 
+} 
+// TODO: this doesn't work, because the Accept header doesn't work in restlet. 
+@Get("json") 
+public Representation getJSON() 
+{ 
+String username = (String) getRequest().getAttributes().get("username"); 
+StringRepresentation representation = null; String json = UserBO.getJSON(username); 
+representation = new StringRepresentation(json, MediaType.APPLICATION_JSON); if (json != null) 
+{ 
+return representation; 
+} else 
+{ 
+setStatus(Status.CLIENT_ERROR_NOT_FOUND); return null; 
+} 
+} 
+@Put 
+public Representation updateUser(Representation entity) 
+{ 
+Representation representation = null; try { 
+representation = new StringRepresentation(UserBO.update(entity.getText()), 
+MediaType.APPLICATION_XML); 
+} 
+catch (InvalidXMLException e) 
+{ 
+setStatus(Status.CLIENT_ERROR_BAD_REQUEST); 
+representation = new StringRepresentation("Invalid XML.", MediaType.TEXT_PLAIN); 
+} 
+catch (ItemNotFoundException e) 
+{ 
+setStatus(Status.CLIENT_ERROR_NOT_FOUND); 
+representation = new StringRepresentation("Item not found.", MediaType.TEXT_PLAIN); 
+} 
+catch (IOException e) 
+{ 
+setStatus(Status.SERVER_ERROR_INTERNAL); 
+} 
+return representation; 
+} 
+@Delete 
+public void deleteUser() 
+{ try { 
+String username = (String) getRequest().getAttributes().get("username");UserBO.delete(username); setStatus(Status.SUCCESS_NO_CONTENT); 
+} 
+catch (ItemNotFoundException e) 
+{ 
+setStatus(Status.CLIENT_ERROR_NOT_FOUND); 
+} 
+} 
+} 
+ 
+UsersResource.java 
+ 
+package pWeb; 
+ 
+/** 
+ * 
+ * @author Anand 
+ */ 
+import java.io.IOException; import org.restlet.data.MediaType; import org.restlet.data.Status; 
+import org.restlet.representation.Representation; import org.restlet.representation.StringRepresentation; import org.restlet.resource.Get; import org.restlet.resource.Post; import org.restlet.resource.ServerResource; import pBusiness.UserBO; 
+import pException.InvalidXMLException; 
+import pException.ItemAlreadyExistsException; 
+ 
+public class UsersResource extends ServerResource 
+{ 
+@Get("xml") 
+public Representation getXML() 
+{ 
+String xml = UserBO.getAllXML(); 
+Representation representation = new StringRepresentation(xml, MediaType.APPLICATION_XML); return representation; 
+} 
+@Get("json") 
+public Representation getJSON() 
+{ 
+String json = UserBO.getAllJSON(); 
+Representation representation = new StringRepresentation(json, MediaType.APPLICATION_JSON); return representation; 
+} 
+@Post 
+public Representation createtUser(Representation entity) 
+{ 
+Representation representation = null;try 
+{ 
+representation = new StringRepresentation(UserBO.create(entity.getText()), 
+MediaType.APPLICATION_XML); 
+} 
+catch(InvalidXMLException e) 
+{ 
+setStatus(Status.CLIENT_ERROR_BAD_REQUEST); 
+representation = new StringRepresentation("Invalid XML.", MediaType.TEXT_PLAIN); 
+} 
+catch(ItemAlreadyExistsException e) 
+{ 
+setStatus(Status.CLIENT_ERROR_FORBIDDEN); 
+representation = new StringRepresentation("Item already exists.", MediaType.TEXT_PLAIN); 
+} 
+catch(IOException e) 
+{ 
+setStatus(Status.SERVER_ERROR_INTERNAL); 
+} 
+return representation; 
+} 
+} 
+ 
+11.	Add the Required JAR files: Libraries > Add JAR/Folder 
+ 
+  
+12.	Run the Application. 
+ 
+  
+13.	Output: 
+ 
+ 
+PRACTICAL 06:
+
+Aim: Develop an Application to consume Google search/ Google Map RESTful Web-Service. 
+ 
+Create several Java Classes as below: 
+ 
+Search.php 
+ 
+<?php 
+error_reporting(0); 
+?> 
+<html> 
+<head> 
+<style type="text/css"> a { color: blue; 
+text-decoration: none; 
+} a:active { color: blue; 
+text-decoration: none; 
+} a:visited { 
+color: blueviolet; text-decoration: none; 
+} a:hover { 
+text-decoration: underline; 
+} 
+</style> </head> 
+<body style="padding-left: 20%;"> 
+<h1 style="margin: 0px; padding: 0px; margin-bottom: 10px;">Google Search</h1> 
+<form method="post" action="search.php"> 
+<input type="text" name="search" size="60" required="required" style="padding: 5px; font-size: medium" value="<?php echo $_POST["search"]; ?>">&nbsp;&nbsp;&nbsp; 
+<input type="submit" value="Search" style="font-size: medium; color: black; padding: 5px"> </form> <?php 
+if(isset($_POST["search"])) 
+{ 
+$link = 
+"https://www.googleapis.com/customsearch/v1?key=AIzaSyCp2S6unAatfoLHpF1gu0fW1Efo2zm0j
+QU&cx=004951281762310843845:qy-pvsc8yy4&q=" .urlencode($_POST["search"]); 
+$data = file_get_contents($link); 
+$data = json_decode($data); $items = $data->items; if(count($items) == 0) 
+echo '<br/><span style="font-size: medium; color: black">No Results Found</span>'; 
+for($i = 0; $i< 10; $i++) 
+{ 
+if(count($items) <= $i) break; 
+$item = $items[$i]; echo '<br/><a href="' . $item->link . '" target="_blank" style="font-size: large;">' . $item->title . 
+'</a>'; 
+echo '<br/><span style="color: green">' . $item->link . '</span>'; 
+echo '<br/><span style="font-size : small;">' . $item->htmlSnippet . '</span><br/>'; 
+} 
+} 
+?> 
+</body> 
+</html> 
+ 
+ 
+Output: 
+ 
+ 
+  
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+PRACTICAL 07: 
+
+Aim:  Develop a WCF Service that returns response in JSON Type.
+ 
+1.	Launch Microsoft Visual Studio and create a WCF Service Application under Visual C#. 
+ 
+  
+ 
+2.	Delete the already provided IService1.svc and IService1.cs Files by default. 
+ 
+  
+3.	Add new WCF Service. 
+  
+  
+ 
+  
+ 
+ 
+ 
+ 
+4.	Add the following Code to newly created Interface. 
+ 
+[OperationContract] 
+        [WebInvoke(Method = "Get", 
+            ResponseFormat = WebMessageFormat.Xml, 
+            BodyStyle = WebMessageBodyStyle.Wrapped, 
+            UriTemplate = "xml/{id}")] 
+ 
+        string XMLData(string id);         [OperationContract] 
+        [WebInvoke(Method = "Get", 
+            ResponseFormat = WebMessageFormat.Json, 
+            BodyStyle = WebMessageBodyStyle.Wrapped, 
+            UriTemplate = "json/{id}")] 
+ 
+   string JSONData(string id); 
+ 
+  
+ 
+5.	Add the following Code to the .cs File of the WCF Service, here: MySrvc class: 
+ 
+#region IMySrvc Members 
+        public string XMLData(string id) 
+        { 
+            return "Your requested product is " + id; 
+        } 
+        public string JSONData(string id) 
+        { 
+            return "Your requested product is " + id; 
+        } 
+        #endregion 
+ 
+ 
+  
+ 
+6.	Check the Web.config file. 
+ 
+  
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+7.	Run the Code and see the Output: Directory Listing. 	 
+ 
+  
+ 
+8.	Click on the *.svc File in the above List and observe the following Output. 
+ 
+  
+ 
+9.	In the URL append desired Format IDs: xml/123 and json/123  separately & check Output. 
+ 
+  
+  
+ 
+ 
+  
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+PRACTICAL 08: 
+
+Aim: Develop an Application to download/upload an Image/Video from/to Server using MTOM Techniques.
+ 
+1.	Copy ‘images’ Folder to C: drive. 
+  
+ 
+2.	Create new Java Project named MyMTOMSrvc.  
+Add a source Package com to it. Now add two Packages: Client and ws to the com folder. 
+Then add one Interface: ImageServer.java and two classes: ImageServerImpl.java and ImagePublisher.java to the ws Package. 
+  
+3.	Add Codes to the Classes. 
+ 
+ImagePublisher.java 
+ 
+package com.ws; 
+ 
+import javax.xml.ws.Endpoint; import com.ws.ImageServerImpl; 
+//Endpoint publisher public class ImagePublisher 
+{ 
+public static void main(String[] args) 
+{ 
+Endpoint.publish("http://localhost:9991/ws/image", new ImageServerImpl()); 
+System.out.println("Server is published!"); 
+} 
+} 
+ 
+ImageServer.java 
+ 
+package com.ws; 
+ 
+import java.awt.Image; import javax.jws.WebMethod; import javax.jws.WebService; import javax.jws.soap.SOAPBinding; 
+import javax.jws.soap.SOAPBinding.Style; 
+ 
+//Service Endpoint Interface 
+@WebService 
+@SOAPBinding(style = Style.RPC) 
+ 
+public interface ImageServer 
+{ 
+//download a image from server 
+@WebMethod Image downloadImage(String name); 
+} 
+ 
+ImageServerImpl.java 
+ 
+package com.ws; 
+ 
+import java.awt.Image; import java.io.File; import java.io.IOException; import javax.imageio.ImageIO; import javax.jws.WebService; import javax.xml.ws.WebServiceException; import javax.xml.ws.soap.MTOM; 
+//Service Implementation Bean 
+@MTOM 
+@WebService(endpointInterface = "com.ws.ImageServer") 
+ 
+public class ImageServerImpl implements ImageServer 
+{ 
+@Override 
+public Image downloadImage(String name) 
+{ try 
+{ 
+File image = new File("c:\\images\\" + name); return ImageIO.read(image); 
+} 
+catch (IOException e) 
+{ 
+e.printStackTrace(); return null; 
+} 
+} 
+} 
+ 
+4.	Add a Class to the client package: ImageClient.java 
+ 
+  
+ 
+5.	Add Code to the Class. 
+ 
+package com.client; 
+ 
+import java.awt.Image; import java.io.File; import java.net.URL; import javax.imageio.ImageIO; import javax.swing.ImageIcon; import javax.swing.JFrame; import javax.swing.JLabel; import javax.xml.namespace.QName; import javax.xml.ws.BindingProvider; import javax.xml.ws.Service; import javax.xml.ws.soap.MTOMFeature; import javax.xml.ws.soap.SOAPBinding; import com.ws.ImageServer; 
+ 
+public class ImageClient 
+{ 
+public static void main(String[] args) throws Exception { 
+	 	URL url = new URL("http://localhost:9991/ws/image?wsdl"); 
+	 	QName qname = new QName("http://ws.com/", "ImageServerImplService"); 
+	 	Service service = Service.create(url, qname); 
+	 	ImageServer imageServer = service.getPort(ImageServer.class); 
+	 	/************ test download ***************/ 
+	 	Image image = imageServer.downloadImage("Ich.jpg"); 
+ 	//display it in frame  	JFrame frame = new JFrame();  	frame.setSize(300, 300); 
+ 	JLabel label = new JLabel(new ImageIcon(image));  	frame.add(label);  	frame.setVisible(true); 
+	 	System.out.println("imageServer.downloadImage() : Download Successful!"); 
+	 	} 
+	 	} 
+ 
+6.	Check Compiler Compliance Level in the Project properties. 
+ 
+  
+7.	Run the MyMTOMSrvc Application and select the Publisher. 
+ 
+  
+ 
+8.	Check the output. 
+ 
+  
+ 
+9.	Now run the MyMTOMSrvc Application again and this time select the Client.
+  
+ 
+10.	Check the output. 
+ 
+
